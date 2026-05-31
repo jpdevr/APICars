@@ -15,24 +15,26 @@
 }
 
 .mode-nav {
-  width: min(1200px, 100%);
-  margin: 0 auto 14px;
+  width: fit-content;
+  min-width: 340px;
+  margin: 0 auto 12px;
   background: rgba(7, 11, 20, 0.92);
   border: 1px solid rgba(168, 184, 228, 0.4);
   border-radius: 14px;
-  padding: 10px;
+  padding: 7px 8px;
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  justify-content: center;
 }
 
 .mode-nav a {
   color: #cfdcff;
   text-decoration: none;
-  padding: 10px 16px;
+  padding: 8px 13px;
   border-radius: 10px;
   border: 1px solid transparent;
   font-weight: 800;
-  font-size: 1.03rem;
+  font-size: 0.96rem;
 }
 
 .mode-nav a.active {

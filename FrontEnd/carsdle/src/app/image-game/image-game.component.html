@@ -1,0 +1,75 @@
+<section class="game-card">
+  <header class="topbar">
+    <h1>Carsdle - Imagem</h1>
+  </header>
+
+  @if (loadingChallenge) {
+    <p class="loading">Carregando desafio de hoje...</p>
+  } @else {
+    <section class="image-puzzle">
+      @if (imageUrl) {
+        <div class="puzzle-frame" [style.background-image]="'url(' + imageUrl + ')'">
+          @for (piece of [0,1,2,3,4,5,6,7,8]; track piece) {
+            @if (!isPieceRevealed(piece)) {
+              <div
+                class="puzzle-piece"
+                [class]="'piece-' + piece"
+                [style.background-image]="'url(' + (pixelatedImageUrl || imageUrl) + ')'"
+              ></div>
+            }
+          }
+        </div>
+      } @else {
+        <div class="image-missing">Imagem indisponivel para hoje.</div>
+      }
+    </section>
+
+    @if (solved) {
+      <p class="success">Parabens! Voce acertou o carro de hoje.</p>
+    } @else if (failed) {
+      <p class="fail">Voce nao acertou hoje. A imagem foi revelada por completo.</p>
+    }
+
+    <div class="search-area">
+      <div class="search-box">
+        <input
+          [ngModel]="query"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Digite um carro..."
+          autocomplete="off"
+        />
+        <button (click)="submitGuess()" [disabled]="!selectedCar || submitting || solved || failed">
+          {{ submitting ? 'Enviando...' : 'Chutar' }}
+        </button>
+      </div>
+
+      <app-search-suggestions
+        [suggestions]="suggestions"
+        [searching]="searching"
+        [query]="query"
+        [showImage]="false"
+        (choose)="chooseSuggestion($event)"
+      />
+    </div>
+
+    @if (guesses.length > 0) {
+      <div class="guess-list">
+        @for (guess of guesses; track $index) {
+          <div
+            class="guess-item"
+            [class.true]="guess.status === 'true'"
+            [class.partial]="guess.status === 'partial'"
+            [class.false]="guess.status === 'false'"
+          >
+            @if (guess.foto) {
+              <img [src]="guess.foto" [alt]="guessLabel(guess)" />
+            } @else {
+              <div class="no-photo">Sem foto</div>
+            }
+            <span>{{ guessLabel(guess) }}</span>
+          </div>
+        }
+      </div>
+    }
+  }
+</section>

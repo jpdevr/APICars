@@ -12,6 +12,7 @@ interface EmojiTodayResponse {
 }
 
 interface EmojiGuessResponse {
+  result?: 'true' | 'false' | 'partial' | boolean;
   status?: 'true' | 'false' | 'partial' | boolean;
   correct?: 'true' | 'false' | 'partial' | boolean;
   emojis: string[];
@@ -131,7 +132,7 @@ export class EmojiGameComponent implements OnInit {
       })
       .subscribe({
         next: (result) => {
-          const status = this.normalizeStatus(result.status ?? result.correct);
+          const status = this.normalizeStatus(result.result ?? result.status ?? result.correct);
 
           this.guesses = [
             {
