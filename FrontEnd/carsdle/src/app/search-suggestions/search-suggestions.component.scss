@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  border: 1px solid #4b5f8c;
+  border-radius: 10px;
+  background: rgba(11, 15, 31, 0.95);
+  list-style: none;
+  overflow: hidden;
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+
+.suggestions li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background: #1d2646;
+}
+
+.suggestions img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.status-row {
+  color: #c7d6ff;
+  font-weight: 600;
+  cursor: default;
+}
+
+.status-row:hover {
+  background: transparent;
+}
