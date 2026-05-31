@@ -30,6 +30,26 @@ Exemplo:
 GET /api/cars/search?query=Ferrari
 ```
 
+### `POST /api/game/emoji/guess`
+Envia uma tentativa de resposta no modo emoji.
+
+Body:
+
+```json
+{
+  "carId": "665abc123"
+}
+```
+
+### `GET /api/game/emoji/today`
+busca ou cria um carro diário, retornando os emojis referentes ao carro do dia.
+
+Exemplo:
+
+```http
+GET /api/game/emoji/post
+```
+
 ## 4. Funcionalidades previstas
 - Cadastro e listagem de carros na base de dados;
 - Exibição de pistas sobre o veículo;
