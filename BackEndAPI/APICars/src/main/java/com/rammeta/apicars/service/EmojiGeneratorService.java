@@ -118,6 +118,7 @@ public class EmojiGeneratorService {
                 - Absolutamente Não coloque algo que possa referenciar eletricidade em carros que não são híbridos e/ou elétricos.
                 - Absolutamente de forma nenhuma repita mais de 1 emoji que referencie a origem do país/região carro.
                 - Absolutamente não coloque refêrencias a clima ou terreno.
+                - NÃO COLOQUE TROFÉUS QUANDO O CARRO NÃO FOR DE CORRIDA.
                 """;
     }
 
