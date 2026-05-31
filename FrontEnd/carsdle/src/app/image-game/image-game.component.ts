@@ -42,6 +42,12 @@ interface ImageGamePersistState {
   revealedCount: number;
 }
 
+interface GameStats {
+  streak: number;
+  lastWinDate: string | null;
+  attemptsByDate: Record<string, number>;
+}
+
 @Component({
   selector: 'app-image-game',
   imports: [CommonModule, FormsModule, SearchSuggestionsComponent],
@@ -64,6 +70,7 @@ export class ImageGameComponent implements OnInit {
   guessedCarIds = new Set<string>();
   solved = false;
   failed = false;
+  stats: GameStats;
 
   readonly totalParts = 9;
   readonly initialRevealedCount = 1;
@@ -76,7 +83,9 @@ export class ImageGameComponent implements OnInit {
   private readonly stateKey = 'carsdle_image_game_state';
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {
+    this.stats = this.loadStats();
+  }
 
   ngOnInit(): void {
     this.loadChallenge();
@@ -156,10 +165,12 @@ export class ImageGameComponent implements OnInit {
             ...this.guesses
           ];
           this.guessedCarIds.add(guessedCar.id);
+          this.increaseAttempts();
 
           if (status === 'true') {
             this.solved = true;
             this.revealedCount = this.totalParts;
+            this.registerWin();
           } else {
             this.revealedCount = Math.min(this.revealedCount + 1, this.totalParts);
             if (this.revealedCount >= this.totalParts) {
@@ -185,6 +196,10 @@ export class ImageGameComponent implements OnInit {
 
   guessLabel(row: ImageGuessRow): string {
     return row.marca ? `${row.marca} ${row.nome}` : row.nome;
+  }
+
+  getTodayAttempts(): number {
+    return this.stats.attemptsByDate[this.activeDate] ?? 0;
   }
 
   private loadChallenge(): void {
@@ -409,5 +424,75 @@ export class ImageGameComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  private loadStats(): GameStats {
+    const raw = this.readCookie('carsdle_image_stats');
+    if (!raw) {
+      return { streak: 0, lastWinDate: null, attemptsByDate: {} };
+    }
+
+    try {
+      const parsed = JSON.parse(decodeURIComponent(raw)) as GameStats;
+      return {
+        streak: Number(parsed.streak || 0),
+        lastWinDate: parsed.lastWinDate || null,
+        attemptsByDate: parsed.attemptsByDate || {}
+      };
+    } catch {
+      return { streak: 0, lastWinDate: null, attemptsByDate: {} };
+    }
+  }
+
+  private persistStats(): void {
+    const safeStats: GameStats = {
+      ...this.stats,
+      attemptsByDate: {
+        [this.activeDate]: this.stats.attemptsByDate[this.activeDate] ?? 0
+      }
+    };
+
+    const encoded = encodeURIComponent(JSON.stringify(safeStats));
+    document.cookie = `carsdle_image_stats=${encoded}; max-age=${60 * 60 * 24 * 365}; path=/; SameSite=Lax`;
+  }
+
+  private increaseAttempts(): void {
+    const current = this.stats.attemptsByDate[this.activeDate] ?? 0;
+    this.stats.attemptsByDate[this.activeDate] = current + 1;
+    this.persistStats();
+  }
+
+  private registerWin(): void {
+    if (this.stats.lastWinDate === this.activeDate) {
+      return;
+    }
+
+    const yesterday = this.relativeDate(-1);
+    if (this.stats.lastWinDate === yesterday) {
+      this.stats.streak += 1;
+    } else {
+      this.stats.streak = 1;
+    }
+
+    this.stats.lastWinDate = this.activeDate;
+    this.persistStats();
+  }
+
+  private readCookie(name: string): string | null {
+    const prefix = `${name}=`;
+    const parts = document.cookie.split(';');
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (trimmed.startsWith(prefix)) {
+        return trimmed.substring(prefix.length);
+      }
+    }
+    return null;
+  }
+
+  private relativeDate(offsetDays: number): string {
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+    return date.toISOString().split('T')[0];
   }
 }

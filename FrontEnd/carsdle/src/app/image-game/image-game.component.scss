@@ -8,10 +8,23 @@
   backdrop-filter: blur(6px);
 }
 
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .topbar h1 {
   font-size: 2.15rem;
   font-weight: 900;
-  margin-bottom: 12px;
+}
+
+.stats {
+  display: flex;
+  gap: 14px;
+  font-weight: 800;
 }
 
 .loading {
@@ -170,6 +183,15 @@
 }
 
 @media (max-width: 960px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stats {
+    flex-wrap: wrap;
+  }
+
   .guess-item {
     width: min(380px, 100%);
   }

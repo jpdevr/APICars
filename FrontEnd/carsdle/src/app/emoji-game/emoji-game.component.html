@@ -1,6 +1,10 @@
 <section class="game-card">
   <header class="topbar">
     <h1>Carsdle - Emoji</h1>
+    <div class="stats">
+      <span>Streak: {{ stats.streak }}</span>
+      <span>Tentativas hoje: {{ getTodayAttempts() }}</span>
+    </div>
   </header>
 
   @if (loadingChallenge) {
