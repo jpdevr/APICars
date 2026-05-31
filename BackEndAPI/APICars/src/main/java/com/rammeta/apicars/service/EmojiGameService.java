@@ -63,10 +63,22 @@ public class EmojiGameService {
 
         DailyChallenge challenge = getOrCreateTodayEmojiChallenge(today);
 
-        boolean correct = challenge.getCarId().equals(request.carId().trim());
+        Car guessedCar = carRepository.findById(request.carId().trim())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Carro não encontrado."
+                ));
+
+        Car targetCar = carRepository.findById(challenge.getCarId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "O carro do desafio emoji existe, mas não foi encontrado no banco."
+                ));
+
+        String status = compareEmojiGuess(guessedCar, targetCar);
 
         return new EmojiGuessResponse(
-                correct,
+                status,
                 challenge.getEmojis()
         );
     }
@@ -144,5 +156,38 @@ public class EmojiGameService {
         challenge.setCreatedAt(LocalDateTime.now(GAME_ZONE));
 
         return dailyChallengeRepository.save(challenge);
+    }
+    private String compareEmojiGuess(Car guessedCar, Car targetCar) {
+        if (guessedCar.getId().equals(targetCar.getId())) {
+            return "true";
+        }
+
+        if (normalize(guessedCar.getMarca()).equals(normalize(targetCar.getMarca()))) {
+            return "partial";
+        }
+
+        return "false";
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value
+                .toLowerCase()
+                .trim()
+                .replace("á", "a")
+                .replace("à", "a")
+                .replace("ã", "a")
+                .replace("â", "a")
+                .replace("é", "e")
+                .replace("ê", "e")
+                .replace("í", "i")
+                .replace("ó", "o")
+                .replace("ô", "o")
+                .replace("õ", "o")
+                .replace("ú", "u")
+                .replace("ç", "c");
     }
 }

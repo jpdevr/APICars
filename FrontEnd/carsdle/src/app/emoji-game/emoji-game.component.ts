@@ -12,7 +12,8 @@ interface EmojiTodayResponse {
 }
 
 interface EmojiGuessResponse {
-  correct: boolean;
+  status?: 'true' | 'false' | 'partial' | boolean;
+  correct?: 'true' | 'false' | 'partial' | boolean;
   emojis: string[];
 }
 
@@ -21,7 +22,7 @@ interface EmojiGuessRow {
   marca?: string;
   nome: string;
   foto?: string;
-  correct: boolean;
+  status: 'true' | 'false' | 'partial';
 }
 
 interface EmojiPersistState {
@@ -117,13 +118,15 @@ export class EmojiGameComponent implements OnInit {
       })
       .subscribe({
         next: (result) => {
+          const status = this.normalizeStatus(result.status ?? result.correct);
+
           this.guesses = [
             {
               carId: this.selectedCar!.id,
               marca: this.selectedCar!.marca,
               nome: this.selectedCar!.nome,
               foto: this.selectedCar!.foto,
-              correct: result.correct
+              status
             },
             ...this.guesses
           ];
@@ -132,7 +135,7 @@ export class EmojiGameComponent implements OnInit {
             this.emojis = result.emojis;
           }
 
-          if (result.correct) {
+          if (status === 'true') {
             this.solved = true;
           }
 
@@ -174,7 +177,7 @@ export class EmojiGameComponent implements OnInit {
 
         if (persisted && persisted.challengeId === data.challengeId) {
           this.solved = persisted.solved;
-          this.guesses = persisted.guesses ?? [];
+          this.guesses = this.normalizeGuesses(persisted.guesses ?? []);
           if (persisted.emojis?.length) {
             this.emojis = persisted.emojis;
           }
@@ -219,5 +222,44 @@ export class EmojiGameComponent implements OnInit {
     };
 
     localStorage.setItem(this.stateKey, JSON.stringify(state));
+  }
+
+  private normalizeGuesses(rawGuesses: unknown[]): EmojiGuessRow[] {
+    const normalized: EmojiGuessRow[] = [];
+
+    for (const item of rawGuesses) {
+      if (!item || typeof item !== 'object') {
+        continue;
+      }
+
+      const source = item as Record<string, unknown>;
+      const carId = String(source['carId'] ?? '');
+      const nome = String(source['nome'] ?? '');
+      if (!carId || !nome) {
+        continue;
+      }
+
+      const status = this.normalizeStatus(source['status'] ?? source['correct']);
+
+      normalized.push({
+        carId,
+        nome,
+        marca: typeof source['marca'] === 'string' ? source['marca'] : undefined,
+        foto: typeof source['foto'] === 'string' ? source['foto'] : undefined,
+        status
+      });
+    }
+
+    return normalized;
+  }
+
+  private normalizeStatus(value: unknown): 'true' | 'false' | 'partial' {
+    if (value === 'true' || value === true) {
+      return 'true';
+    }
+    if (value === 'partial') {
+      return 'partial';
+    }
+    return 'false';
   }
 }

@@ -43,7 +43,12 @@
     @if (guesses.length > 0) {
       <div class="guess-list">
         @for (guess of guesses; track $index) {
-          <div class="guess-item" [class.correct]="guess.correct" [class.wrong]="!guess.correct">
+          <div
+            class="guess-item"
+            [class.true]="guess.status === 'true'"
+            [class.partial]="guess.status === 'partial'"
+            [class.false]="guess.status === 'false'"
+          >
             @if (guess.foto) {
               <img [src]="guess.foto" [alt]="guessLabel(guess)" />
             } @else {

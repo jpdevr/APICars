@@ -124,12 +124,16 @@
   flex-shrink: 0;
 }
 
-.guess-item.wrong {
+.guess-item.false {
   background: #8f1f1f;
 }
 
-.guess-item.correct {
+.guess-item.true {
   background: #1f8a4b;
+}
+
+.guess-item.partial {
+  background: #b48500;
 }
 
 .success {
