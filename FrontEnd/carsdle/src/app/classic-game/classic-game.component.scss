@@ -80,6 +80,9 @@
   margin-top: 16px;
   position: relative;
   z-index: 5;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .row {

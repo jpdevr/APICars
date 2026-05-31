@@ -43,6 +43,7 @@ interface ClassicPersistState {
   activeDate: string;
   solved: boolean;
   rows: GuessRow[];
+  guessedCarIds?: string[];
 }
 
 @Component({
@@ -83,6 +84,7 @@ export class ClassicGameComponent {
   activeDate = this.today();
   selectedCar: SearchCar | null = null;
   stats: GameStats;
+  guessedCarIds = new Set<string>();
 
   private readonly apiBase = environment.apiBaseUrl;
   private readonly gameStateKey = 'carsdle_classic_state';
@@ -117,7 +119,8 @@ export class ClassicGameComponent {
           next: (data) => {
             this.suggestions = (data ?? [])
               .map((item) => mapSearchCar(item))
-              .filter((car): car is SearchCar => Boolean(car));
+              .filter((car): car is SearchCar => Boolean(car))
+              .filter((car) => !this.guessedCarIds.has(car.id));
             this.searching = false;
           },
           error: () => {
@@ -129,17 +132,21 @@ export class ClassicGameComponent {
   }
 
   chooseSuggestion(car: SearchCar): void {
+    if (this.guessedCarIds.has(car.id)) {
+      return;
+    }
     this.selectedCar = car;
     this.query = carDisplay(car);
     this.suggestions = [];
   }
 
   submitGuess(): void {
-    if (!this.selectedCar || this.submitting || this.solved) {
+    if (!this.selectedCar || this.submitting || this.solved || this.guessedCarIds.has(this.selectedCar.id)) {
       return;
     }
 
     this.submitting = true;
+    const guessedCarId = this.selectedCar.id;
 
     this.http
       .post<GuessResponse>(`${this.apiBase}/api/game/classic/guess`, {
@@ -152,6 +159,7 @@ export class ClassicGameComponent {
             revealedCount: 0
           };
           this.rows = [row, ...this.rows];
+          this.guessedCarIds.add(guessedCarId);
           this.increaseAttempts();
           this.revealRow(0);
 
@@ -250,9 +258,11 @@ export class ClassicGameComponent {
         ...row,
         revealedCount: this.fieldOrder.length
       }));
+      this.guessedCarIds = new Set(parsed.guessedCarIds ?? []);
     } catch {
       this.rows = [];
       this.solved = false;
+      this.guessedCarIds = new Set<string>();
     }
   }
 
@@ -263,7 +273,8 @@ export class ClassicGameComponent {
       rows: this.rows.map((row) => ({
         ...row,
         revealedCount: this.fieldOrder.length
-      }))
+      })),
+      guessedCarIds: Array.from(this.guessedCarIds)
     };
 
     localStorage.setItem(this.gameStateKey, JSON.stringify(payload));

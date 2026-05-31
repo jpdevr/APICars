@@ -31,6 +31,7 @@ interface EmojiPersistState {
   emojis: string[];
   solved: boolean;
   guesses: EmojiGuessRow[];
+  guessedCarIds?: string[];
 }
 
 @Component({
@@ -51,6 +52,7 @@ export class EmojiGameComponent implements OnInit {
   emojis: string[] = [];
   guesses: EmojiGuessRow[] = [];
   solved = false;
+  guessedCarIds = new Set<string>();
 
   private readonly apiBase = environment.apiBaseUrl;
   private readonly activeDate = new Date().toISOString().split('T')[0];
@@ -87,7 +89,8 @@ export class EmojiGameComponent implements OnInit {
           next: (data) => {
             this.suggestions = (data ?? [])
               .map((item) => mapSearchCar(item))
-              .filter((car): car is SearchCar => Boolean(car));
+              .filter((car): car is SearchCar => Boolean(car))
+              .filter((car) => !this.guessedCarIds.has(car.id));
             this.searching = false;
           },
           error: () => {
@@ -99,17 +102,27 @@ export class EmojiGameComponent implements OnInit {
   }
 
   chooseSuggestion(car: SearchCar): void {
+    if (this.guessedCarIds.has(car.id)) {
+      return;
+    }
     this.selectedCar = car;
     this.query = carDisplay(car);
     this.suggestions = [];
   }
 
   submitGuess(): void {
-    if (!this.selectedCar || this.submitting || this.solved || !this.challengeId) {
+    if (
+      !this.selectedCar ||
+      this.submitting ||
+      this.solved ||
+      !this.challengeId ||
+      this.guessedCarIds.has(this.selectedCar.id)
+    ) {
       return;
     }
 
     this.submitting = true;
+    const guessedCarId = this.selectedCar.id;
 
     this.http
       .post<EmojiGuessResponse>(`${this.apiBase}/api/game/emoji/guess`, {
@@ -130,6 +143,7 @@ export class EmojiGameComponent implements OnInit {
             },
             ...this.guesses
           ];
+          this.guessedCarIds.add(guessedCarId);
 
           if (Array.isArray(result.emojis) && result.emojis.length > 0) {
             this.emojis = result.emojis;
@@ -178,12 +192,14 @@ export class EmojiGameComponent implements OnInit {
         if (persisted && persisted.challengeId === data.challengeId) {
           this.solved = persisted.solved;
           this.guesses = this.normalizeGuesses(persisted.guesses ?? []);
+          this.guessedCarIds = new Set(persisted.guessedCarIds ?? this.guesses.map((guess) => guess.carId));
           if (persisted.emojis?.length) {
             this.emojis = persisted.emojis;
           }
         } else {
           this.solved = false;
           this.guesses = [];
+          this.guessedCarIds = new Set<string>();
           this.persistState();
         }
 
@@ -218,7 +234,8 @@ export class EmojiGameComponent implements OnInit {
       challengeId: this.challengeId,
       emojis: this.emojis,
       solved: this.solved,
-      guesses: this.guesses
+      guesses: this.guesses,
+      guessedCarIds: Array.from(this.guessedCarIds)
     };
 
     localStorage.setItem(this.stateKey, JSON.stringify(state));

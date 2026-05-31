@@ -88,6 +88,9 @@
   display: grid;
   gap: 10px;
   justify-items: center;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .guess-item {
