@@ -151,9 +151,9 @@ export class ClassicGameComponent {
             attempt: result,
             revealedCount: 0
           };
-          this.rows = [...this.rows, row];
+          this.rows = [row, ...this.rows];
           this.increaseAttempts();
-          this.revealRow(this.rows.length - 1);
+          this.revealRow(0);
 
           if (result.correct) {
             this.solved = true;

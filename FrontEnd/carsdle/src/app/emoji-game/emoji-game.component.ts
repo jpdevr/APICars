@@ -118,14 +118,14 @@ export class EmojiGameComponent implements OnInit {
       .subscribe({
         next: (result) => {
           this.guesses = [
-            ...this.guesses,
             {
               carId: this.selectedCar!.id,
               marca: this.selectedCar!.marca,
               nome: this.selectedCar!.nome,
               foto: this.selectedCar!.foto,
               correct: result.correct
-            }
+            },
+            ...this.guesses
           ];
 
           if (Array.isArray(result.emojis) && result.emojis.length > 0) {
