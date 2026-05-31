@@ -5,5 +5,23 @@
     <a routerLink="/image-game" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Imagem</a>
   </nav>
 
-  <router-outlet />
+  <div class="page-content">
+    <router-outlet />
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <button
+        class="info-chip"
+        type="button"
+        title="Informacoes de contato e autoria"
+        aria-label="Informacoes de contato e autoria"
+      >
+        i
+      </button>
+      <a href="https://github.com/jpdevr" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://www.linkedin.com/in/jpdevr324/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="mailto:joaogapires@gmail.com">joaogapires@gmail.com</a>
+    </div>
+  </footer>
 </main>

@@ -12,6 +12,12 @@
   padding: 24px;
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1;
 }
 
 .mode-nav {
@@ -43,6 +49,48 @@
   border-color: rgba(186, 202, 255, 0.6);
 }
 
+.site-footer {
+  margin: auto -24px -24px;
+  width: calc(100% + 48px);
+  padding: 10px 16px;
+  background: #050507;
+  border-top: 1px solid rgba(168, 184, 228, 0.32);
+}
+
+.footer-content {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-chip {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(168, 184, 228, 0.6);
+  background: #1b2b56;
+  color: #eaf1ff;
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: default;
+}
+
+.site-footer a {
+  color: #d7e3ff;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.site-footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
 @media (max-width: 960px) {
   :host {
     font-size: 16px;
@@ -54,5 +102,15 @@
 
   .mode-nav {
     margin-bottom: 10px;
+  }
+
+  .site-footer {
+    margin: auto -12px -12px;
+    width: calc(100% + 24px);
+    padding: 10px 8px;
+  }
+
+  .footer-content {
+    flex-wrap: wrap;
   }
 }
