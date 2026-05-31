@@ -4,7 +4,7 @@
   color: #f4f6ff;
   position: relative;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .shell-wrapper {
@@ -20,9 +20,45 @@
   flex: 1;
 }
 
+.updates-bar {
+  width: min(260px, 100%);
+  margin: 0 auto 12px;
+  background: rgba(7, 11, 20, 0.9);
+  border: 1px solid rgba(168, 184, 228, 0.34);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.updates-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.chip-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(168, 184, 228, 0.6);
+  background: #1b2b56;
+  color: #eaf1ff;
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chip-button:hover {
+  filter: brightness(1.15);
+}
+
 .mode-nav {
   width: fit-content;
-  min-width: 340px;
+  min-width: 320px;
   margin: 0 auto 12px;
   background: rgba(7, 11, 20, 0.92);
   border: 1px solid rgba(168, 184, 228, 0.4);
@@ -52,13 +88,33 @@
 .site-footer {
   margin: auto -24px -24px;
   width: calc(100% + 48px);
-  padding: 10px 16px;
+  padding: 8px 16px;
   background: #050507;
   border-top: 1px solid rgba(168, 184, 228, 0.32);
 }
 
+.daily-countdown {
+  width: min(760px, 100%);
+  margin: 8px auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(168, 184, 228, 0.28);
+  background: rgba(5, 7, 14, 0.78);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.daily-countdown strong {
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
 .footer-content {
-  width: min(1200px, 100%);
+  width: min(760px, 100%);
   margin: 0 auto;
   display: flex;
   gap: 14px;
@@ -76,19 +132,128 @@
   font-size: 0.9rem;
   font-weight: 900;
   line-height: 1;
-  cursor: default;
+  cursor: pointer;
 }
 
 .site-footer a {
   color: #d7e3ff;
   text-decoration: none;
-  font-size: 0.92rem;
+  font-size: 1.05rem;
   font-weight: 700;
+}
+
+.platform-link {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.platform-link img {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .site-footer a:hover {
   color: #ffffff;
   text-decoration: underline;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 60;
+}
+
+.modal-card {
+  position: fixed;
+  z-index: 61;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(740px, calc(100% - 24px));
+  max-height: 84vh;
+  overflow-y: auto;
+  background: #1d232d;
+  border: 1px solid rgba(176, 193, 236, 0.5);
+  border-radius: 12px;
+  padding: 16px 16px 12px;
+}
+
+.modal-card h2 {
+  font-size: 1.75rem;
+  margin-bottom: 10px;
+}
+
+.modal-card h3 {
+  font-size: 1.3rem;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.modal-card p {
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.about-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.about-text {
+  flex: 1;
+}
+
+.about-profile {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.about-profile img {
+  width: 130px;
+  height: 130px;
+  border-radius: 999px;
+  border: 2px solid rgba(176, 193, 236, 0.7);
+  object-fit: cover;
+}
+
+.about-contact {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  opacity: 0.95;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.about-contact-icons {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.modal-card a {
+  color: #8fc1ff;
+}
+
+.modal-close {
+  position: sticky;
+  float: right;
+  top: 0;
+  border: 1px solid rgba(176, 193, 236, 0.6);
+  border-radius: 8px;
+  padding: 2px 8px;
+  background: rgba(7, 11, 20, 0.95);
+  color: #eaf1ff;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 @media (max-width: 960px) {
@@ -102,6 +267,16 @@
 
   .mode-nav {
     margin-bottom: 10px;
+  }
+
+  .updates-bar {
+    width: min(240px, 100%);
+  }
+
+  .about-main {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: left;
   }
 
   .site-footer {

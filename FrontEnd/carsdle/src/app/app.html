@@ -1,12 +1,25 @@
 <main class="shell-wrapper">
   <nav class="mode-nav">
-    <a routerLink="/classic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Classico</a>
+    <a routerLink="/classic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Clássico</a>
     <a routerLink="/emoji" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Emoji</a>
     <a routerLink="/image-game" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Imagem</a>
   </nav>
 
+  <section class="updates-bar">
+    <div class="updates-actions">
+      <button class="chip-button" type="button" (click)="openUpdates()" aria-label="Notas de atualização">🛈</button>
+      <button class="chip-button" type="button" (click)="openAbout()" aria-label="Sobre o projeto">i</button>
+      <button class="chip-button" type="button" (click)="openHowToPlay()" aria-label="Como jogar">?</button>
+    </div>
+  </section>
+
   <div class="page-content">
     <router-outlet />
+  </div>
+
+  <div class="daily-countdown">
+    <span>Próximo carro em (América/São Paulo):</span>
+    <strong>{{ countdown }}</strong>
   </div>
 
   <footer class="site-footer">
@@ -14,14 +27,87 @@
       <button
         class="info-chip"
         type="button"
-        title="Informacoes de contato e autoria"
-        aria-label="Informacoes de contato e autoria"
+        title="Informações de contato e autoria"
+        aria-label="Informações de contato e autoria"
+        (click)="openAbout()"
       >
         i
       </button>
-      <a href="https://github.com/jpdevr" target="_blank" rel="noopener noreferrer">GitHub</a>
-      <a href="https://www.linkedin.com/in/jpdevr324/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-      <a href="mailto:joaogapires@gmail.com">joaogapires@gmail.com</a>
+      <a href="https://github.com/jpdevr" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="platform-link">
+        <img src="https://cdn.simpleicons.org/github/ffffff" alt="GitHub" />
+      </a>
+      <a href="https://www.linkedin.com/in/jpdevr324/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="platform-link">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/linkedin.png" alt="LinkedIn" />
+      </a>
+      <a href="mailto:joaogapires@gmail.com" aria-label="E-mail" class="platform-link">
+        <img src="https://cdn.simpleicons.org/gmail/ffffff" alt="E-mail" />
+      </a>
     </div>
   </footer>
 </main>
+
+@if (showAboutModal || showHowToPlayModal || showUpdatesModal) {
+  <div class="modal-backdrop" (click)="closeModals()"></div>
+}
+
+@if (showAboutModal) {
+  <section class="modal-card" role="dialog" aria-modal="true" aria-label="Sobre o projeto">
+    <button class="modal-close" type="button" (click)="closeModals()" aria-label="Fechar">x</button>
+    <h2>Sobre</h2>
+    <div class="about-main">
+      <div class="about-text">
+        <p>
+          Cardle é um guessing game de carros desenvolvido com muito carinho por mim João Pedro Gonçalves de Aquino.
+        </p>
+        <p>
+          Cardle foi desenvolvido sem intuitos comerciais e dá todos os créditos necessários às montadoras, revistas e
+          blogs na internet dos quais foram usados de inspiração.
+        </p>
+      </div>
+      <div class="about-profile">
+        <img src="https://github.com/jpdevr.png" alt="João Pedro Gonçalves de Aquino" />
+      </div>
+    </div>
+    <p class="about-contact">
+      Tem alguma sugestão ou identificou algum problema? Por favor me contate em:
+      <span class="about-contact-icons">
+        <a href="mailto:joaogapires@gmail.com" aria-label="E-mail" class="platform-link">
+          <img src="https://cdn.simpleicons.org/gmail/ffffff" alt="E-mail" />
+        </a>
+        <a href="https://github.com/jpdevr" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="platform-link">
+          <img src="https://cdn.simpleicons.org/github/ffffff" alt="GitHub" />
+        </a>
+        <a href="https://www.linkedin.com/in/jpdevr324/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="platform-link">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/linkedin.png" alt="LinkedIn" />
+        </a>
+      </span>
+    </p>
+  </section>
+}
+
+@if (showHowToPlayModal) {
+  <section class="modal-card" role="dialog" aria-modal="true" aria-label="Como jogar">
+    <button class="modal-close" type="button" (click)="closeModals()" aria-label="Fechar">x</button>
+    <h2>Como jogar</h2>
+    <p>O carro do dia troca a cada meia-noite em América/São Paulo.</p>
+    <h3>Modo Clássico</h3>
+    <p>Digite um carro e compare os campos. Verde = certo, amarelo = parcial, vermelho = errado.</p>
+    <h3>Modo Emoji</h3>
+    <p>Cada tentativa libera mais emojis. Acertou: revela tudo. Cores: true verde, partial amarelo, false vermelho.</p>
+    <h3>Modo Imagem</h3>
+    <p>A imagem vem pixelada em 9 partes. Cada erro revela mais uma parte. Se acabar sem acertar, revela tudo.</p>
+    <p>Em todos os modos: tentativa mais recente no topo e sem repetir carro já chutado no mesmo modo.</p>
+  </section>
+}
+
+@if (showUpdatesModal) {
+  <section class="modal-card" role="dialog" aria-modal="true" aria-label="Notas de atualização">
+    <button class="modal-close" type="button" (click)="closeModals()" aria-label="Fechar">x</button>
+    <h2>Notas de atualização</h2>
+    <p>Versão atual com três modos:</p>
+    <p>• Clássico: comparação por atributos e setas de direção.</p>
+    <p>• Emoji: desbloqueio progressivo de emojis por tentativa.</p>
+    <p>• Imagem: puzzle com partes pixeladas e revelação progressiva.</p>
+    <p>Também inclui persistência diária, streak por modo e bloqueio de tentativas repetidas.</p>
+  </section>
+}
