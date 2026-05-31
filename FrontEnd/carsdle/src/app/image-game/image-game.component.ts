@@ -247,8 +247,8 @@ export class ImageGameComponent implements OnInit {
     img.onload = () => {
       const targetWidth = 1280;
       const targetHeight = 720;
-      const pixelWidth = 48;
-      const pixelHeight = 27;
+      const pixelWidth = 32;
+      const pixelHeight = 18;
 
       const tinyCanvas = document.createElement('canvas');
       tinyCanvas.width = pixelWidth;
