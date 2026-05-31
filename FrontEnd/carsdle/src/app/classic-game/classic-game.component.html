@@ -54,9 +54,20 @@
                       <span>{{ getFieldValue(fieldKey, row.attempt.guess[fieldKey]) }}</span>
                     }
                   } @else {
-                    <span>{{ getFieldValue(fieldKey, row.attempt.guess[fieldKey]) }}</span>
-                    @if (fieldKey === 'periodoLancamento' && row.attempt.guess[fieldKey].direction) {
-                      <strong>{{ directionArrow(row.attempt.guess[fieldKey].direction) }}</strong>
+                    @if (fieldKey === 'periodoLancamento') {
+                      <div class="launch-cell">
+                        @if (row.attempt.guess[fieldKey].direction) {
+                          <img
+                            class="launch-arrow-bg"
+                            [class.down]="row.attempt.guess[fieldKey].direction === 'down'"
+                            src="/arrow.png"
+                            alt=""
+                          />
+                        }
+                        <span class="launch-value">{{ getFieldValue(fieldKey, row.attempt.guess[fieldKey]) }}</span>
+                      </div>
+                    } @else {
+                      <span>{{ getFieldValue(fieldKey, row.attempt.guess[fieldKey]) }}</span>
                     }
                   }
                 </div>
