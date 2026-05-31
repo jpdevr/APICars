@@ -5,7 +5,7 @@
     } @else {
       @for (car of suggestions; track trackById($index, car)) {
         <li (click)="onChoose(car)">
-          @if (car.foto) {
+          @if (showImage && car.foto) {
             <img [src]="car.foto" [alt]="car.nome" />
           }
           <span>{{ car.marca ? car.marca + ' ' : '' }}{{ car.nome }}</span>

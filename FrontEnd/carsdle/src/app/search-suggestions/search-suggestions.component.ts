@@ -13,6 +13,7 @@ export class SearchSuggestionsComponent {
   @Input() suggestions: SearchCar[] = [];
   @Input() searching = false;
   @Input() query = '';
+  @Input() showImage = true;
   @Output() choose = new EventEmitter<SearchCar>();
 
   get shouldShow(): boolean {

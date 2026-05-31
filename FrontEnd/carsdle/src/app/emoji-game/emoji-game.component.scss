@@ -1,0 +1,150 @@
+.game-card {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  background: rgba(7, 11, 20, 0.88);
+  border: 1px solid rgba(168, 184, 228, 0.4);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+
+.topbar h1 {
+  font-size: 2.15rem;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.loading {
+  font-weight: 800;
+}
+
+.emoji-panel {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(80px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.emoji-slot {
+  min-height: 92px;
+  border-radius: 14px;
+  border: 1px solid rgba(196, 210, 255, 0.4);
+  display: grid;
+  place-items: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: rgba(20, 25, 43, 0.78);
+  color: #ffffff;
+  opacity: 0.45;
+  box-shadow: 0 0 0 rgba(98, 159, 255, 0);
+  transition: all 0.28s ease;
+}
+
+.emoji-slot.visible {
+  opacity: 1;
+  background: rgba(36, 48, 83, 0.92);
+  box-shadow: 0 0 26px rgba(82, 146, 255, 0.5);
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+}
+
+.search-area {
+  position: relative;
+  z-index: 20;
+}
+
+.search-box input {
+  flex: 1;
+  background: #0f1428;
+  border: 1px solid #31446d;
+  border-radius: 10px;
+  color: #ecf2ff;
+  padding: 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.search-box button {
+  background: #ff6f3c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 1.02rem;
+  padding: 0 22px;
+  cursor: pointer;
+}
+
+.search-box button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guess-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.guess-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(420px, 42%);
+  border-radius: 12px;
+  border: 1px solid rgba(250, 250, 250, 0.16);
+  padding: 8px 10px;
+  min-height: 106px;
+  font-size: 1.06rem;
+  font-weight: 900;
+}
+
+.guess-item img {
+  width: 148px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.no-photo {
+  width: 148px;
+  height: 88px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: grid;
+  place-items: center;
+  font-size: 0.84rem;
+  background: rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.guess-item.wrong {
+  background: #8f1f1f;
+}
+
+.guess-item.correct {
+  background: #1f8a4b;
+}
+
+.success {
+  margin: 10px 0 14px;
+  color: #8eff9c;
+  font-size: 1.16rem;
+  font-weight: 900;
+}
+
+@media (max-width: 960px) {
+  .emoji-panel {
+    grid-template-columns: repeat(3, minmax(90px, 1fr));
+  }
+
+  .guess-item {
+    width: min(380px, 100%);
+  }
+}

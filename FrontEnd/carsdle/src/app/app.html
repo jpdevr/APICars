@@ -5,76 +5,11 @@
 <div class="shooting-star"></div>
 <div class="shooting-star"></div>
 
-<main class="game-wrapper">
-  <section class="game-card">
-    <header class="topbar">
-      <h1>Carsdle</h1>
-      <div class="stats">
-        <span>Streak: {{ stats.streak }}</span>
-        <span>Tentativas hoje: {{ getTodayAttempts() }}</span>
-      </div>
-    </header>
+<main class="shell-wrapper">
+  <nav class="mode-nav">
+    <a routerLink="/classic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Classico</a>
+    <a routerLink="/emoji" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Emoji</a>
+  </nav>
 
-    <div class="search-area">
-      <div class="search-box">
-        <input
-          [ngModel]="query"
-          (ngModelChange)="onSearchChange($event)"
-          placeholder="Digite um carro..."
-          autocomplete="off"
-        />
-        <button (click)="submitGuess()" [disabled]="!selectedCar || submitting || solved">
-          {{ submitting ? 'Enviando...' : 'Chutar' }}
-        </button>
-      </div>
-
-      <app-search-suggestions
-        [suggestions]="suggestions"
-        [searching]="searching"
-        [query]="query"
-        (choose)="chooseSuggestion($event)"
-      />
-    </div>
-
-    @if (solved) {
-      <p class="success">Acertou! Volte amanha para o proximo carro.</p>
-    }
-
-    <section class="attempts-panel">
-      @if (rows.length > 0) {
-        <div class="board">
-          <div class="row header-row">
-            @for (field of fieldOrder; track field) {
-              <div class="cell">{{ fieldLabels[field] }}</div>
-            }
-          </div>
-
-          @for (row of rows; track $index) {
-            <div class="row">
-              @for (fieldKey of fieldOrder; track fieldKey; let i = $index) {
-                @if (isFieldVisible(row, i)) {
-                  <div class="cell reveal" [class]="getCellStatusClass(row.attempt.guess[fieldKey])">
-                    @if (fieldKey === 'foto') {
-                      @if (row.attempt.guess.foto.value) {
-                        <img [src]="'' + row.attempt.guess.foto.value" [alt]="'Foto do carro'" />
-                      } @else {
-                        <span>{{ getFieldValue(fieldKey, row.attempt.guess[fieldKey]) }}</span>
-                      }
-                    } @else {
-                      <span>{{ getFieldValue(fieldKey, row.attempt.guess[fieldKey]) }}</span>
-                      @if (fieldKey === 'periodoLancamento' && row.attempt.guess[fieldKey].direction) {
-                        <strong>{{ directionArrow(row.attempt.guess[fieldKey].direction) }}</strong>
-                      }
-                    }
-                  </div>
-                } @else {
-                  <div class="cell hidden"></div>
-                }
-              }
-            </div>
-          }
-        </div>
-      }
-    </section>
-  </section>
+  <router-outlet />
 </main>
