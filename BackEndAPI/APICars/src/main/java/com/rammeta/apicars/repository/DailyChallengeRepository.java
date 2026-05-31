@@ -12,4 +12,6 @@ public interface DailyChallengeRepository extends MongoRepository<DailyChallenge
     Optional<DailyChallenge> findByModeAndDate(String mode, LocalDate date);
 
     List<DailyChallenge> findTop70ByModeOrderByDateDesc(String mode);
+
+    List<DailyChallenge> findByDate(LocalDate date);
 }
