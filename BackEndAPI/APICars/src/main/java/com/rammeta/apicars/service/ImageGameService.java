@@ -10,6 +10,7 @@ import com.rammeta.apicars.repository.DailyChallengeRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -19,7 +20,7 @@ import java.util.Set;
 public class ImageGameService {
 
     private static final String IMAGE_MODE = "imageGuess";
-
+    private static final ZoneId GAME_ZONE = ZoneId.of("America/Sao_Paulo");
     private final DailyChallengeRepository dailyChallengeRepository;
     private final CarRepository carRepository;
 
@@ -32,7 +33,7 @@ public class ImageGameService {
     }
 
     public ImageChallengeResponse getDailyImageChallenge() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(GAME_ZONE);
 
         DailyChallenge challenge = dailyChallengeRepository
                 .findByModeAndDate(IMAGE_MODE, today)
@@ -48,7 +49,7 @@ public class ImageGameService {
     }
 
     public ImageGuessResponse guess(ImageGuessRequest request) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(GAME_ZONE);
 
         DailyChallenge challenge = dailyChallengeRepository
                 .findByModeAndDate(IMAGE_MODE, today)
