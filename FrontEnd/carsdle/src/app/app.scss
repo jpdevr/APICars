@@ -256,6 +256,90 @@
   cursor: pointer;
 }
 
+.celebration-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+}
+
+.trophy-wrap {
+  position: absolute;
+  left: 50%;
+  top: 16%;
+  transform: translateX(-50%);
+  opacity: 1;
+  transition: transform 0.7s ease, opacity 0.7s ease;
+}
+
+.trophy-wrap.exit {
+  transform: translate(-50%, -170px);
+  opacity: 0;
+}
+
+.trophy-lottie {
+  width: min(460px, 70vw);
+  height: min(460px, 70vw);
+}
+
+.confetti {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 30px;
+  background: #ffd300;
+  top: -6%;
+  opacity: 0;
+  animation: makeItRain 1300ms infinite ease-out;
+}
+
+.confetti-piece:nth-child(odd) { background: #7431e8; }
+.confetti-piece:nth-child(4n-7) { background: #ff2e2e; }
+.confetti-piece:nth-child(5n) { background: #00d97e; }
+
+.confetti-piece:nth-child(1) { left: 3%; animation-delay: 60ms; animation-duration: 900ms; transform: rotate(-35deg); }
+.confetti-piece:nth-child(2) { left: 7%; animation-delay: 190ms; animation-duration: 1100ms; transform: rotate(9deg); }
+.confetti-piece:nth-child(3) { left: 11%; animation-delay: 330ms; animation-duration: 1150ms; transform: rotate(-45deg); }
+.confetti-piece:nth-child(4) { left: 15%; animation-delay: 110ms; animation-duration: 850ms; transform: rotate(53deg); }
+.confetti-piece:nth-child(5) { left: 19%; animation-delay: 270ms; animation-duration: 1200ms; transform: rotate(-56deg); }
+.confetti-piece:nth-child(6) { left: 23%; animation-delay: 90ms; animation-duration: 990ms; transform: rotate(30deg); }
+.confetti-piece:nth-child(7) { left: 27%; animation-delay: 420ms; animation-duration: 1080ms; transform: rotate(15deg); }
+.confetti-piece:nth-child(8) { left: 31%; animation-delay: 20ms; animation-duration: 920ms; transform: rotate(62deg); }
+.confetti-piece:nth-child(9) { left: 35%; animation-delay: 240ms; animation-duration: 980ms; transform: rotate(-70deg); }
+.confetti-piece:nth-child(10) { left: 39%; animation-delay: 320ms; animation-duration: 1170ms; transform: rotate(8deg); }
+.confetti-piece:nth-child(11) { left: 43%; animation-delay: 150ms; animation-duration: 1120ms; transform: rotate(5deg); }
+.confetti-piece:nth-child(12) { left: 47%; animation-delay: 390ms; animation-duration: 860ms; transform: rotate(42deg); }
+.confetti-piece:nth-child(13) { left: 51%; animation-delay: 470ms; animation-duration: 880ms; transform: rotate(-68deg); }
+.confetti-piece:nth-child(14) { left: 55%; animation-delay: 80ms; animation-duration: 1030ms; transform: rotate(-24deg); }
+.confetti-piece:nth-child(15) { left: 59%; animation-delay: 300ms; animation-duration: 980ms; transform: rotate(37deg); }
+.confetti-piece:nth-child(16) { left: 63%; animation-delay: 145ms; animation-duration: 930ms; transform: rotate(28deg); }
+.confetti-piece:nth-child(17) { left: 67%; animation-delay: 220ms; animation-duration: 1100ms; transform: rotate(-47deg); }
+.confetti-piece:nth-child(18) { left: 71%; animation-delay: 520ms; animation-duration: 860ms; transform: rotate(11deg); }
+.confetti-piece:nth-child(19) { left: 75%; animation-delay: 180ms; animation-duration: 950ms; transform: rotate(-72deg); }
+.confetti-piece:nth-child(20) { left: 79%; animation-delay: 390ms; animation-duration: 1200ms; transform: rotate(20deg); }
+.confetti-piece:nth-child(21) { left: 83%; animation-delay: 45ms; animation-duration: 920ms; transform: rotate(61deg); }
+.confetti-piece:nth-child(22) { left: 87%; animation-delay: 260ms; animation-duration: 1020ms; transform: rotate(-31deg); }
+.confetti-piece:nth-child(23) { left: 91%; animation-delay: 170ms; animation-duration: 980ms; transform: rotate(48deg); }
+.confetti-piece:nth-child(24) { left: 95%; animation-delay: 350ms; animation-duration: 1140ms; transform: rotate(-57deg); }
+.confetti-piece:nth-child(n + 25) { display: none; }
+
+.confetti-piece:nth-child(4n) { width: 5px; height: 12px; animation-duration: 1800ms; }
+.confetti-piece:nth-child(3n) { width: 3px; height: 10px; animation-duration: 2200ms; animation-delay: 700ms; }
+
+@keyframes makeItRain {
+  from { opacity: 0; transform: translateY(0) rotate(0deg); }
+  30% { opacity: 1; }
+  to { opacity: 0.9; transform: translateY(120vh) rotate(320deg); }
+}
+
 @media (max-width: 960px) {
   :host {
     font-size: 16px;
@@ -287,5 +371,14 @@
 
   .footer-content {
     flex-wrap: wrap;
+  }
+
+  .trophy-wrap {
+    top: 20%;
+  }
+
+  .trophy-lottie {
+    width: min(340px, 80vw);
+    height: min(340px, 80vw);
   }
 }

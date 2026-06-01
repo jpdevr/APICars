@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SearchSuggestionsComponent } from '../search-suggestions/search-suggestions.component';
 import { SearchCar, carDisplay, mapSearchCar } from '../models';
 import { environment } from '../../environments/environment';
+import { CelebrationService } from '../celebration.service';
 
 interface EmojiTodayResponse {
   challengeId: string;
@@ -67,7 +68,10 @@ export class EmojiGameComponent implements OnInit {
   private readonly stateKey = 'carsdle_emoji_state';
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly http: HttpClient) {
+  constructor(
+    private readonly http: HttpClient,
+    private readonly celebrationService: CelebrationService
+  ) {
     this.stats = this.loadStats();
   }
 
@@ -163,6 +167,7 @@ export class EmojiGameComponent implements OnInit {
           if (status === 'true') {
             this.solved = true;
             this.registerWin();
+            this.celebrationService.trigger();
           }
 
           this.persistState();

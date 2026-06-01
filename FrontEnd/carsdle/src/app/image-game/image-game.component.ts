@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SearchSuggestionsComponent } from '../search-suggestions/search-suggestions.component';
 import { SearchCar, carDisplay, mapSearchCar } from '../models';
 import { environment } from '../../environments/environment';
+import { CelebrationService } from '../celebration.service';
 
 type GuessStatus = 'true' | 'false' | 'partial';
 
@@ -83,7 +84,10 @@ export class ImageGameComponent implements OnInit {
   private readonly stateKey = 'carsdle_image_game_state';
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly http: HttpClient) {
+  constructor(
+    private readonly http: HttpClient,
+    private readonly celebrationService: CelebrationService
+  ) {
     this.stats = this.loadStats();
   }
 
@@ -171,6 +175,7 @@ export class ImageGameComponent implements OnInit {
             this.solved = true;
             this.revealedCount = this.totalParts;
             this.registerWin();
+            this.celebrationService.trigger();
           } else {
             this.revealedCount = Math.min(this.revealedCount + 1, this.totalParts);
             if (this.revealedCount >= this.totalParts) {

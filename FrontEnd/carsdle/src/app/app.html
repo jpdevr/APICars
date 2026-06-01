@@ -46,6 +46,19 @@
   </footer>
 </main>
 
+@if (showCelebration) {
+  <section class="celebration-layer" aria-hidden="true">
+    <div class="confetti">
+      @for (piece of confettiPieces; track piece) {
+        <div class="confetti-piece"></div>
+      }
+    </div>
+    <div class="trophy-wrap" [class.exit]="trophyExiting">
+      <div id="trophy-lottie-container" class="trophy-lottie"></div>
+    </div>
+  </section>
+}
+
 @if (showAboutModal || showHowToPlayModal || showUpdatesModal) {
   <div class="modal-backdrop" (click)="closeModals()"></div>
 }

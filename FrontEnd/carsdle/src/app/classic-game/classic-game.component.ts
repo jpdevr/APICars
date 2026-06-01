@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SearchSuggestionsComponent } from '../search-suggestions/search-suggestions.component';
 import { SearchCar, carDisplay, mapSearchCar } from '../models';
 import { environment } from '../../environments/environment';
+import { CelebrationService } from '../celebration.service';
 
 type GuessStatus = 'correct' | 'partial' | 'wrong';
 type GuessFieldKey =
@@ -90,7 +91,10 @@ export class ClassicGameComponent {
   private readonly gameStateKey = 'carsdle_classic_state';
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly http: HttpClient) {
+  constructor(
+    private readonly http: HttpClient,
+    private readonly celebrationService: CelebrationService
+  ) {
     this.stats = this.loadStats();
     this.loadGameState();
   }
@@ -166,6 +170,7 @@ export class ClassicGameComponent {
           if (result.correct) {
             this.solved = true;
             this.registerWin();
+            this.celebrationService.trigger();
           }
 
           this.query = '';
