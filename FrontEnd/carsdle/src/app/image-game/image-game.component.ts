@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SearchSuggestionsComponent } from '../search-suggestions/search-suggestions.component';
 import { SearchCar, carDisplay, mapSearchCar } from '../models';
 import { environment } from '../../environments/environment';
 import { CelebrationService } from '../celebration.service';
+import { getSaoPauloDateKey, getSaoPauloRelativeDate } from '../date-utils';
 
 type GuessStatus = 'true' | 'false' | 'partial';
 
@@ -55,7 +56,7 @@ interface GameStats {
   templateUrl: './image-game.component.html',
   styleUrl: './image-game.component.scss'
 })
-export class ImageGameComponent implements OnInit {
+export class ImageGameComponent implements OnInit, OnDestroy {
   query = '';
   searching = false;
   submitting = false;
@@ -80,9 +81,11 @@ export class ImageGameComponent implements OnInit {
   revealedCount = this.initialRevealedCount;
 
   private readonly apiBase = environment.apiBaseUrl;
-  private readonly activeDate = new Date().toISOString().split('T')[0];
+  private activeDate = getSaoPauloDateKey();
   private readonly stateKey = 'carsdle_image_game_state';
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
+  private daySyncTimer: ReturnType<typeof setInterval> | null = null;
+  private loadVersion = 0;
 
   constructor(
     private readonly http: HttpClient,
@@ -93,6 +96,19 @@ export class ImageGameComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadChallenge();
+    this.startDaySync();
+  }
+
+  ngOnDestroy(): void {
+    this.loadVersion += 1;
+
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
+    }
+
+    if (this.daySyncTimer) {
+      clearInterval(this.daySyncTimer);
+    }
   }
 
   onSearchChange(value: string): void {
@@ -208,10 +224,15 @@ export class ImageGameComponent implements OnInit {
   }
 
   private loadChallenge(): void {
+    const requestVersion = ++this.loadVersion;
     this.loadingChallenge = true;
 
     this.http.get<ImageGameGetResponse>(`${this.apiBase}/api/game/image-game`).subscribe({
       next: (response) => {
+        if (requestVersion !== this.loadVersion) {
+          return;
+        }
+
         const challengeId = this.pickString(response, ['challengeId']) ?? '';
         const imageUrl =
           this.pickFirstArrayString(response, ['images']) ??
@@ -221,7 +242,7 @@ export class ImageGameComponent implements OnInit {
         this.challengeId = challengeId;
         this.imageUrl = imageUrl;
         this.pixelatedImageUrl = '';
-        this.generatePixelatedImage(imageUrl);
+        this.generatePixelatedImage(imageUrl, requestVersion);
 
         const persisted = this.loadState();
         if (persisted && persisted.challengeId === challengeId) {
@@ -242,9 +263,25 @@ export class ImageGameComponent implements OnInit {
         this.loadingChallenge = false;
       },
       error: () => {
+        if (requestVersion !== this.loadVersion) {
+          return;
+        }
+
         this.loadingChallenge = false;
       }
     });
+  }
+
+  private startDaySync(): void {
+    this.daySyncTimer = setInterval(() => {
+      const currentDate = getSaoPauloDateKey();
+      if (currentDate === this.activeDate) {
+        return;
+      }
+
+      this.activeDate = currentDate;
+      this.loadChallenge();
+    }, 1_000);
   }
 
   private resetForNewChallenge(): void {
@@ -256,7 +293,7 @@ export class ImageGameComponent implements OnInit {
     this.revealedCount = this.initialRevealedCount;
   }
 
-  private generatePixelatedImage(sourceUrl: string): void {
+  private generatePixelatedImage(sourceUrl: string, requestVersion: number): void {
     if (!sourceUrl) {
       this.pixelatedImageUrl = '';
       return;
@@ -275,7 +312,9 @@ export class ImageGameComponent implements OnInit {
       tinyCanvas.height = pixelHeight;
       const tinyCtx = tinyCanvas.getContext('2d');
       if (!tinyCtx) {
-        this.pixelatedImageUrl = sourceUrl;
+        if (requestVersion === this.loadVersion) {
+          this.pixelatedImageUrl = sourceUrl;
+        }
         return;
       }
       tinyCtx.imageSmoothingEnabled = false;
@@ -286,16 +325,22 @@ export class ImageGameComponent implements OnInit {
       finalCanvas.height = targetHeight;
       const finalCtx = finalCanvas.getContext('2d');
       if (!finalCtx) {
-        this.pixelatedImageUrl = sourceUrl;
+        if (requestVersion === this.loadVersion) {
+          this.pixelatedImageUrl = sourceUrl;
+        }
         return;
       }
       finalCtx.imageSmoothingEnabled = false;
       finalCtx.drawImage(tinyCanvas, 0, 0, targetWidth, targetHeight);
 
-      this.pixelatedImageUrl = finalCanvas.toDataURL('image/jpeg', 0.9);
+      if (requestVersion === this.loadVersion) {
+        this.pixelatedImageUrl = finalCanvas.toDataURL('image/jpeg', 0.9);
+      }
     };
     img.onerror = () => {
-      this.pixelatedImageUrl = sourceUrl;
+      if (requestVersion === this.loadVersion) {
+        this.pixelatedImageUrl = sourceUrl;
+      }
     };
     img.src = sourceUrl;
   }
@@ -496,8 +541,6 @@ export class ImageGameComponent implements OnInit {
   }
 
   private relativeDate(offsetDays: number): string {
-    const date = new Date();
-    date.setDate(date.getDate() + offsetDays);
-    return date.toISOString().split('T')[0];
+    return getSaoPauloRelativeDate(offsetDays);
   }
 }

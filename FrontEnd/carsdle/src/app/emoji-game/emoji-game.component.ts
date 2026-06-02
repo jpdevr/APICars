@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SearchSuggestionsComponent } from '../search-suggestions/search-suggestions.component';
 import { SearchCar, carDisplay, mapSearchCar } from '../models';
 import { environment } from '../../environments/environment';
 import { CelebrationService } from '../celebration.service';
+import { getSaoPauloDateKey, getSaoPauloRelativeDate } from '../date-utils';
 
 interface EmojiTodayResponse {
   challengeId: string;
@@ -48,7 +49,7 @@ interface GameStats {
   templateUrl: './emoji-game.component.html',
   styleUrl: './emoji-game.component.scss'
 })
-export class EmojiGameComponent implements OnInit {
+export class EmojiGameComponent implements OnInit, OnDestroy {
   query = '';
   searching = false;
   submitting = false;
@@ -64,9 +65,11 @@ export class EmojiGameComponent implements OnInit {
   stats: GameStats;
 
   private readonly apiBase = environment.apiBaseUrl;
-  private readonly activeDate = new Date().toISOString().split('T')[0];
+  private activeDate = getSaoPauloDateKey();
   private readonly stateKey = 'carsdle_emoji_state';
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
+  private daySyncTimer: ReturnType<typeof setInterval> | null = null;
+  private loadVersion = 0;
 
   constructor(
     private readonly http: HttpClient,
@@ -77,6 +80,19 @@ export class EmojiGameComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTodayChallenge();
+    this.startDaySync();
+  }
+
+  ngOnDestroy(): void {
+    this.loadVersion += 1;
+
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
+    }
+
+    if (this.daySyncTimer) {
+      clearInterval(this.daySyncTimer);
+    }
   }
 
   onSearchChange(value: string): void {
@@ -202,10 +218,15 @@ export class EmojiGameComponent implements OnInit {
   }
 
   private loadTodayChallenge(): void {
+    const requestVersion = ++this.loadVersion;
     this.loadingChallenge = true;
 
     this.http.get<EmojiTodayResponse>(`${this.apiBase}/api/game/emoji/today`).subscribe({
       next: (data) => {
+        if (requestVersion !== this.loadVersion) {
+          return;
+        }
+
         const persisted = this.loadState();
         this.challengeId = data.challengeId;
         this.emojis = data.emojis ?? [];
@@ -227,9 +248,31 @@ export class EmojiGameComponent implements OnInit {
         this.loadingChallenge = false;
       },
       error: () => {
+        if (requestVersion !== this.loadVersion) {
+          return;
+        }
+
         this.loadingChallenge = false;
       }
     });
+  }
+
+  private startDaySync(): void {
+    this.daySyncTimer = setInterval(() => {
+      const currentDate = getSaoPauloDateKey();
+      if (currentDate === this.activeDate) {
+        return;
+      }
+
+      this.activeDate = currentDate;
+      this.solved = false;
+      this.guesses = [];
+      this.guessedCarIds = new Set<string>();
+      this.query = '';
+      this.selectedCar = null;
+      this.suggestions = [];
+      this.loadTodayChallenge();
+    }, 1_000);
   }
 
   private loadState(): EmojiPersistState | null {
@@ -366,8 +409,6 @@ export class EmojiGameComponent implements OnInit {
   }
 
   private relativeDate(offsetDays: number): string {
-    const date = new Date();
-    date.setDate(date.getDate() + offsetDays);
-    return date.toISOString().split('T')[0];
+    return getSaoPauloRelativeDate(offsetDays);
   }
 }

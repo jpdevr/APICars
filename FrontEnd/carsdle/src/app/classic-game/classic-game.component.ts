@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SearchSuggestionsComponent } from '../search-suggestions/search-suggestions.component';
 import { SearchCar, carDisplay, mapSearchCar } from '../models';
 import { environment } from '../../environments/environment';
 import { CelebrationService } from '../celebration.service';
+import { getSaoPauloDateKey, getSaoPauloRelativeDate } from '../date-utils';
 
 type GuessStatus = 'correct' | 'partial' | 'wrong';
 type GuessFieldKey =
@@ -53,7 +54,7 @@ interface ClassicPersistState {
   templateUrl: './classic-game.component.html',
   styleUrl: './classic-game.component.scss'
 })
-export class ClassicGameComponent {
+export class ClassicGameComponent implements OnDestroy {
   readonly fieldOrder: GuessFieldKey[] = [
     'foto',
     'marca',
@@ -90,6 +91,8 @@ export class ClassicGameComponent {
   private readonly apiBase = environment.apiBaseUrl;
   private readonly gameStateKey = 'carsdle_classic_state';
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
+  private daySyncTimer: ReturnType<typeof setInterval> | null = null;
+  private revealTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private readonly http: HttpClient,
@@ -97,6 +100,21 @@ export class ClassicGameComponent {
   ) {
     this.stats = this.loadStats();
     this.loadGameState();
+    this.startDaySync();
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
+    }
+
+    if (this.daySyncTimer) {
+      clearInterval(this.daySyncTimer);
+    }
+
+    if (this.revealTimer) {
+      clearInterval(this.revealTimer);
+    }
   }
 
   onSearchChange(value: string): void {
@@ -227,11 +245,27 @@ export class ClassicGameComponent {
   private revealRow(rowIndex: number): void {
     const total = this.fieldOrder.length;
     let step = 0;
+    const revealDate = this.activeDate;
 
-    const interval = setInterval(() => {
+    if (this.revealTimer) {
+      clearInterval(this.revealTimer);
+    }
+
+    this.revealTimer = setInterval(() => {
+      if (this.activeDate !== revealDate) {
+        if (this.revealTimer) {
+          clearInterval(this.revealTimer);
+          this.revealTimer = null;
+        }
+        return;
+      }
+
       const row = this.rows[rowIndex];
       if (!row) {
-        clearInterval(interval);
+        if (this.revealTimer) {
+          clearInterval(this.revealTimer);
+          this.revealTimer = null;
+        }
         return;
       }
 
@@ -241,7 +275,10 @@ export class ClassicGameComponent {
 
       step += 1;
       if (step >= total) {
-        clearInterval(interval);
+        if (this.revealTimer) {
+          clearInterval(this.revealTimer);
+          this.revealTimer = null;
+        }
       }
     }, 230);
   }
@@ -269,6 +306,28 @@ export class ClassicGameComponent {
       this.solved = false;
       this.guessedCarIds = new Set<string>();
     }
+  }
+
+  private startDaySync(): void {
+    this.daySyncTimer = setInterval(() => {
+      const currentDate = this.today();
+      if (currentDate === this.activeDate) {
+        return;
+      }
+
+      this.activeDate = currentDate;
+      this.rows = [];
+      this.solved = false;
+      this.guessedCarIds = new Set<string>();
+      this.query = '';
+      this.selectedCar = null;
+      this.suggestions = [];
+      if (this.revealTimer) {
+        clearInterval(this.revealTimer);
+        this.revealTimer = null;
+      }
+      this.persistGameState();
+    }, 1_000);
   }
 
   private persistGameState(): void {
@@ -350,12 +409,10 @@ export class ClassicGameComponent {
   }
 
   private today(): string {
-    return new Date().toISOString().split('T')[0];
+    return getSaoPauloDateKey();
   }
 
   private relativeDate(offsetDays: number): string {
-    const date = new Date();
-    date.setDate(date.getDate() + offsetDays);
-    return date.toISOString().split('T')[0];
+    return getSaoPauloRelativeDate(offsetDays);
   }
 }
